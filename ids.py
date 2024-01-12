@@ -41,7 +41,16 @@ class Ids(object):
     @staticmethod
     def load_config():
         # Implémentez la fonction de chargement de la configuration ici
-        pass
+        # Assurez-vous de retourner le contenu du fichier de configuration sous forme de dictionnaire
+        config_file_path = "/etc/ids/ids_config.json"
+
+        try:
+            with open(config_file_path, 'r') as json_file:
+                config = json.load(json_file)
+            return config
+        except FileNotFoundError:
+            print(f"Error: Config file not found at {config_file_path}")
+            return {}
 
     @staticmethod
     def get_file_info(file_path):
