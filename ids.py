@@ -8,10 +8,10 @@ class Ids(object):
 
     def CreateRight():
         subprocess.run(['useradd', '-p', 'ids', 'ids'])
-        subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
+        # subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
         subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
-        subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
-        subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
+        # subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
+        # subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
 
 
     @staticmethod
@@ -36,13 +36,6 @@ class Ids(object):
         except FileExistsError:
 
             print(f"Error: {db_file_path} already exists.")
-
-    def CreateRight():
-        subprocess.run(['useradd', '-p', 'ids', 'ids'])
-        subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
-        subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
-        subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
-        subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
 
     def check(self):
         print('Checking IDS...')
