@@ -2,36 +2,47 @@ import fire
 import json
 from datetime import datetime
 import os
+import subprocess
 
 class Ids(object):
+
+    def CreateRight():
+        subprocess.run(['useradd', '-p', 'ids', 'ids'])
+        subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
+        subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
+        subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
+        subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
+
+
     @staticmethod
     def build():
-        # Chemin complet pour le répertoire /var/ids
+        Ids.CreateRight()
+
         ids_dir = "/var/ids"
 
-        # Vérifie si le répertoire existe
         if not os.path.exists(ids_dir):
-            # S'il n'existe pas, crée le répertoire
             os.makedirs(ids_dir)
             print(f"Created directory: {ids_dir}")
 
-        # Chemin complet pour le fichier db.json
         db_file_path = os.path.join(ids_dir, "db.json")
 
         try:
-            # Tente d'ouvrir le fichier en mode création ('x')
             with open(db_file_path, 'x') as json_file:
-                # Initialise la structure de données à stocker dans db.json
                 data = {"build_time": str(datetime.now()), "files": {}}
 
-                # Écrit les données dans le fichier db.json
                 json.dump(data, json_file, indent=2)
 
-                # Enregistre dans les logs
                 Ids.log(f"Build successful. Database saved to {db_file_path}")
         except FileExistsError:
-            # Si le fichier existe déjà, imprime un message d'erreur
+
             print(f"Error: {db_file_path} already exists.")
+
+    def CreateRight():
+        subprocess.run(['useradd', '-p', 'ids', 'ids'])
+        subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
+        subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
+        subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
+        subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
 
     def check(self):
         print('Checking IDS...')
