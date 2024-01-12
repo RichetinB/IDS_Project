@@ -20,7 +20,7 @@ class Ids(object):
 
         try:
             # Tente d'ouvrir le fichier en mode création ('x')
-            with open(db_file_path, 'x') as json_file:
+            with open(db_file_path, 'w') as json_file:
                 # Initialise la structure de données à stocker dans db.json
                 data = {"build_time": str(datetime.now()), "files": {}}
 
