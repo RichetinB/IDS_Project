@@ -1,48 +1,106 @@
-import fire
-import json
-from datetime import datetime
+from sys import argv
 import os
+import argparse
+import __future__
+import json
 import subprocess
 
-class Ids(object):
+# Argument 
+parser= argparse.ArgumentParser()
+parser.add_argument( "-build", "--build", action="store_const", const=1, help="construit un fichier JSON qui contient un état des choses qu'on a demandé à surveiller")
+parser.add_argument( "-check", "--check", action="store_const", const=1, help="vérifie que l'état actuel est conforme à ce qui a été stocké dans | /var/ids/db.json | ")
+parser.add_argument( "-init", "--init", action="store_const", const=1, help="Commande à Lancer des la PREMIERE UTILISATION")
+arg = parser.parse_args()
 
-    def CreateRight():
-        subprocess.run(['useradd', '-p', 'ids', 'ids'])
-        # subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
-        subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
-        # subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
-        # subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
+#FONCTION ##############################################################################
+
+def CreateFileConf():
+    if os.path.exists("/etc/ids.json"):
+        return
+    else:
+        open("/etc/ids.json", "x")
+        #Write Json Conf
+        ConfJson = json.dumps(BaseDataConf)
+        with open("/etc/ids.json", "w") as jsonfile:
+            jsonfile.write(ConfJson)
+            print("Write Succes")
+
+def CreateCloneJson():
+    if os.path.isdir("/var/ids"):
+        return 
+    else:
+        os.mkdir("/var/ids")
+        open("/var/ids/db.json", "x")
+
+def CreateLogs():
+    if os.path.exists("/var/log/ids.log"):
+        return
+    else:
+        open("/var/log/ids.log", "x")
+
+def CreateBin():
+    if os.path.isdir("/var/local/bin"):
+        return
+    else:
+        os.mkdir("/var/local/bin")
+        os.mkdir("/var/local/bin/ids")
+        #Bouger de place le fichier exe
 
 
-    @staticmethod
-    def build():
-        Ids.CreateRight()
 
-        ids_dir = "/var/ids"
+def CreateRight():
+    subprocess.run(['useradd', '-p', 'ids', 'ids'])
+    subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
+    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
 
-        if not os.path.exists(ids_dir):
-            os.makedirs(ids_dir)
-            print(f"Created directory: {ids_dir}")
 
-        db_file_path = os.path.join(ids_dir, "db.json")
+def IsInit() -> bool:
+    if os.path.exists("/etc/ids.json"):
+        return True
+    else:
+        return False
 
-        try:
-            with open(db_file_path, 'x') as json_file:
-                data = {"build_time": str(datetime.now()), "files": {}}
 
-                json.dump(data, json_file, indent=2)
 
-                Ids.log(f"Build successful. Database saved to {db_file_path}")
-        except FileExistsError:
+# Data #######################################################################################
+    
 
-            print(f"Error: {db_file_path} already exists.")
+BaseDataConf = {
+    "file":[],
+    "dir":[],
+    "port":False 
+}
 
-    def check(self):
-        print('Checking IDS...')
-
-    def help(self):
-        print('Helping IDS...')
+################################################################################################
 
 
 if __name__ == '__main__':
-  fire.Fire(Ids)
+
+
+    #Verif Quelle arguement est passé
+    if arg.init == 1:
+        if IsInit() == False:
+            CreateFileConf()
+            CreateCloneJson()
+            CreateLogs()
+            CreateBin()
+            CreateRight()
+        else:
+            print("Le Init a Déja etais Utilisé")
+
+    #Verif Quelle arguement est passé
+    if arg.build == 1:
+        if IsInit() == False:
+            print("ERREUR: Utililse (-init) La premiere fois")
+        else:
+            print("build")
+
+
+    #Verif Quelle arguement est passé
+    if arg.check == 1:
+        if IsInit() == False:
+            print("ERREUR: Utililse (-init) La premiere fois")
+        else:
+            print("check")
