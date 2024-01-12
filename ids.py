@@ -1,6 +1,6 @@
 import fire
 
-class Ids(object):
+class Ids():
   
 
   def build(self):
