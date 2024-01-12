@@ -5,7 +5,7 @@ import os
 
 class Ids(object):
     @staticmethod
-    def create_db_file():
+    def build():
         # Chemin complet pour le répertoire /var/ids
         ids_dir = "/var/ids"
 
