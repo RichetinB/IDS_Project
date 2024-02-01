@@ -34,7 +34,9 @@ def create_init_script():
     subprocess.run(['chmod', 'u+x', script_path])
 
 def InitializeSystem():
-    subprocess.run(['./init_script.sh'])
+    script_path = "/home/baptiste/IDS_Project/init_script.sh"
+    subprocess.run([script_path])
+
 
 
 # Fonction pour construire le fichier JSON
