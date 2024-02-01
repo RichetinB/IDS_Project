@@ -26,16 +26,16 @@ def create_init_script():
     #!/bin/bash
     # Contenu du script d'initialisation
     """
-    with open("/home/baptiste/IDS_Project/init_script.sh", "w") as file:
+    script_path = "/home/baptiste/IDS_Project/init_script.sh"
+    with open(script_path, "w") as file:
         file.write(script_content)
 
     # Changer les permissions du script pour le rendre exécutable
-    os.chmod("/home/baptiste/IDS_Project/init_script.sh", 0o755)
+    subprocess.run(['chmod', 'u+x', script_path])
 
 def InitializeSystem():
     subprocess.run(['/home/baptiste/IDS_Project/init_script.sh'])
 
-subprocess.run(['./init_script.sh'])
 
 # Fonction pour construire le fichier JSON
 def Build():
