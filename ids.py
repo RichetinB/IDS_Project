@@ -33,7 +33,6 @@ def create_init_script():
     os.chmod("/home/baptiste/IDS_Project/init_script.sh", 0o755)
 
 def InitializeSystem():
-    create_init_script()
     subprocess.run(['/home/baptiste/IDS_Project/init_script.sh'])
 
 subprocess.run(['./init_script.sh'])
@@ -114,7 +113,9 @@ def get_watch_paths():
 if __name__ == '__main__':
     # Verifier quel argument est passé
     if arg.init == 1:
+        create_init_script()
         InitializeSystem()
+
     elif arg.build == 1:
         Build()
     elif arg.check == 1:
