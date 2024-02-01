@@ -97,7 +97,7 @@ def Build():
     db_file_path = "/var/ids/db.json"
 
     with open(db_file_path, 'w') as json_file:
-        json.dump(data, json_file, indent=4)
+        json.dump(data, json_file,separators=(',', ':'))
 
     print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
 
