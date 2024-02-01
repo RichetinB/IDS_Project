@@ -118,7 +118,6 @@ def get_watch_paths():
     return watch_paths
 
 # Fonction pour construire le fichier JSON
-# Fonction pour construire le fichier JSON
 def Build():
     if not is_initialized():
         print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
@@ -127,15 +126,11 @@ def Build():
     watch_paths = get_watch_paths()
     files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
 
-    conf_file_path = "/etc/ids.json"
-    with open(conf_file_path, 'r') as json_file:
-        config_data = json.load(json_file)
-
     data = {
         "build_time": str(datetime.now()), 
         "files": files_info,       
         "directories": watch_paths["dir"],  
-        "port": config_data["port"]          
+        "port": BaseDataConf["port"]  # Utilisez BaseDataConf["port"] au lieu de config_data["port"]        
     }
 
     db_file_path = "/var/ids/db.json"
@@ -143,6 +138,8 @@ def Build():
         json.dump(data, json_file, indent=4)
 
     print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
+
+
 
 
 # Fonction pour vérifier si l'initialisation a déjà été effectuée
