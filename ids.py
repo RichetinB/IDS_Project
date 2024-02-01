@@ -21,12 +21,20 @@ BaseDataConf = {
 }
 
 
-# Fonction pour initialiser le système
+def create_init_script():
+    script_content = """
+    #!/bin/bash
+    # Contenu du script d'initialisation
+    """
+    with open("init_script.sh", "w") as file:
+        file.write(script_content)
+
+    os.chmod("init_script.sh", 0o755) 
+
 def InitializeSystem():
-    """
-    Initialise le système en exécutant le script d'initialisation.
-    """
-    subprocess.run(['./init_script.sh'])
+   create_init_script()
+
+subprocess.run(['./init_script.sh'])
 
 # Fonction pour construire le fichier JSON
 def Build():
