@@ -4,6 +4,7 @@ import argparse
 import __future__
 import json
 import subprocess
+from datetime import datetime
 
 # Argument 
 parser= argparse.ArgumentParser()
@@ -49,7 +50,7 @@ def CreateBin():
 
 
 def CreateRight():
-    subprocess.run(['useradd', '-p', 'ids', 'ids'])
+    subprocess.run(['useradd    ', '-p', 'ids', 'ids'])
     subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
     subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
     subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
@@ -73,6 +74,35 @@ BaseDataConf = {
     "port":False 
 }
 
+# Function Build##############################################################################
+
+
+def Build():
+    if not IsInit():
+        print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
+        return
+
+    conf_file_path = "/etc/ids.json"
+
+    with open(conf_file_path, 'r') as json_file:
+        config_data = json.load(json_file)
+
+    data = {
+        "build_time": str(datetime.now()), 
+        "files": config_data["file"],       
+        "directories": config_data["dir"],  
+        "port": config_data["port"]          
+    }
+
+    db_file_path = "/var/ids/db.json"
+
+    with open(db_file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+
+    print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
+
+
+
 ################################################################################################
 
 
@@ -92,6 +122,7 @@ if __name__ == '__main__':
 
     #Verif Quelle arguement est passé
     if arg.build == 1:
+        Build()
         if IsInit() == False:
             print("ERREUR: Utililse (-init) La premiere fois")
         else:
@@ -104,3 +135,6 @@ if __name__ == '__main__':
             print("ERREUR: Utililse (-init) La premiere fois")
         else:
             print("check")
+
+
+
