@@ -26,13 +26,15 @@ def create_init_script():
     #!/bin/bash
     # Contenu du script d'initialisation
     """
-    with open("init_script.sh", "w") as file:
+    with open("/home/baptiste/IDS_Project/init_script.sh", "w") as file:
         file.write(script_content)
 
-    os.chmod("init_script.sh", 0o755) 
+    # Changer les permissions du script pour le rendre exécutable
+    os.chmod("/home/baptiste/IDS_Project/init_script.sh", 0o755)
 
 def InitializeSystem():
-   create_init_script()
+    create_init_script()
+    subprocess.run(['/home/baptiste/IDS_Project/init_script.sh'])
 
 subprocess.run(['./init_script.sh'])
 
