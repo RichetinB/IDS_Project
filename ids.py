@@ -228,10 +228,7 @@ def Check():
     # Construction du rapport
     report = generate_report(files_changed, directories_changed)
 
-    # Conversion du rapport en format JSON
-    report_json = json.dumps(report, indent=2)  # indent=2 pour une indentation lisible
-
-    return report_json
+    return report
 
 
 # Main entry point of the script
