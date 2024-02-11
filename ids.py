@@ -8,7 +8,6 @@ import psutil
 from datetime import datetime
 
 def setup_logger(program_name):
-    RightLog()
     log_folder = '/var/log/' + program_name
     log_file = os.path.join(log_folder, 'ids_log.log')
 
@@ -20,9 +19,6 @@ def setup_logger(program_name):
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def RightLog():
-    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids_log.log' ])
-    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids_log.log'])
 
 def log_command_execution(command, result):
     logger.info(f"Commande exécutée: {command}")
