@@ -34,26 +34,11 @@ def CreateCloneJson():
         os.mkdir("/var/ids")
         open("/var/ids/db.json", "x")
 
-def CreateLogs():
-    if os.path.exists("/var/log/ids.log"):
-        return
-    else:
-        open("/var/log/ids.log", "x")
-
-def CreateBin():
-    if os.path.isdir("/var/local/bin"):
-        return
-    else:
-        os.mkdir("/var/local/bin")
-        os.mkdir("/var/local/bin/ids")
-        # Move the executable file
-
 def CreateRight():
     subprocess.run(['useradd', '-p', 'ids', 'ids'])
     subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
     subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
-    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
-    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log', '/etc/ids.json', '/var/ids/db.json'])
+    subprocess.run(['chown', '-R', 'ids:ids', '/etc/ids.json', '/var/ids/db.json'])
     
 
 def IsInit() -> bool:
@@ -64,7 +49,7 @@ def IsInit() -> bool:
 BaseDataConf = {
     "file": [],
     "dir": [],
-    "port": False,
+    "port": False
 }
 
 # Function Build##############################################################################
@@ -238,8 +223,6 @@ if __name__ == '__main__':
         if not IsInit():
             CreateFileConf()
             CreateCloneJson()
-            CreateLogs()
-            CreateBin()
             CreateRight()
         else:
             print("L'initialisation a déjà été effectuée")
