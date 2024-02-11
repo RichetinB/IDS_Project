@@ -178,25 +178,56 @@ def get_watch_paths():
 
 
 # Function to check if the current state is consistent with the stored state
-def Check():
-    # Load the stored state from /var/ids/db.json
-    with open("/var/ids/db.json", "r") as json_file:
-        stored_state = json.load(json_file)
+def check_files(stored_files):
+    files_changed = []
 
-    # Get the current state
-    current_state = {
-        "files": [get_file_info(file_path) for file_path in stored_state["files"]],
-        "directories": stored_state["directories"],
-        "port": stored_state["port"]
-    }
+    for file_info in stored_files:
+        file_path = file_info["file_path"]
+        if not os.path.exists(file_path):
+            files_changed.append({"file_path": file_path, "status": "missing"})
+        else:
+            current_last_modified = os.path.getmtime(file_path)
+            stored_last_modified = file_info["last_modified"]
+            if current_last_modified != stored_last_modified:
+                files_changed.append({"file_path": file_path, "status": "modified"})
 
-    # Compare the stored state with the current state
-    if stored_state == current_state:
-        # If nothing has changed, return {"state": "ok"}
-        return {"state": "ok"}
+    return files_changed
+
+def check_directories(stored_directories):
+    directories_changed = []
+
+    for directory in stored_directories:
+        if not os.path.exists(directory):
+            directories_changed.append({"directory": directory, "status": "missing"})
+
+    return directories_changed
+
+def generate_report(files_changed, directories_changed):
+    report = {}
+    if len(files_changed) > 0 or len(directories_changed) > 0:
+        report["state"] = "divergent"
+        report["files_changed"] = files_changed
+        report["directories_changed"] = directories_changed
     else:
-        # If there are differences, return a report indicating the divergences
-        return {"state": "divergent", "differences": {"files": current_state["files"], "directories": current_state["directories"], "port": current_state["port"]}}
+        report["state"] = "ok"
+
+    return report
+
+def Check():
+    # Chargement de l'état actuel depuis le fichier db.json
+    with open('/var/ids/db.json', 'r') as db_file:
+        stored_state = json.load(db_file)
+
+    # Vérification des fichiers
+    files_changed = check_files(stored_state["files"])
+
+    # Vérification des répertoires
+    directories_changed = check_directories(stored_state["directories"])
+
+    # Construction du rapport
+    report = generate_report(files_changed, directories_changed)
+
+    return report
 
 
 # Main entry point of the script
@@ -222,7 +253,7 @@ if __name__ == '__main__':
 
     if arg.check == 1:
         result = Check()
-        print(json.dumps(result))
+        print(json.dumps(result, indent=2))
         if not IsInit():
             print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
         else:
