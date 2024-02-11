@@ -228,7 +228,10 @@ def Check():
     # Construction du rapport
     report = generate_report(files_changed, directories_changed)
 
-    return report
+    # Conversion du rapport en format JSON
+    report_json = json.dumps(report, separators=(',', ':'))  # indent=2 pour une indentation lisible
+
+    return report_json
 
 
 # Main entry point of the script
@@ -253,8 +256,7 @@ if __name__ == '__main__':
             print("Construction du fichier JSON")
 
     if arg.check == 1:
-        result = Check()
-        print(json.dumps(result, indent=2))
+        Check()
         if not IsInit():
             print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
         else:
