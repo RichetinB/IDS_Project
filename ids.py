@@ -79,7 +79,6 @@ def get_listening_ports():
     return output
 
 # Function to build the JSON file
-# Function to build the JSON file
 def Build():
     if not is_initialized():
         print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
@@ -89,26 +88,25 @@ def Build():
     files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
     directories_info = watch_paths["dir"]
 
+    # Vérifier si la surveillance des ports est activée
+    if is_port_enabled():
+        listen_ports_info = get_listen_ports_info()
+    else:
+        listen_ports_info = []
+
     data = {
         "build_time": str(datetime.now()), 
         "files": files_info,       
         "directories": directories_info,  
+        "port": BaseDataConf["port"],  
+        "listen_ports": listen_ports_info  
     }
-
-    # Vérifier si la surveillance des ports est activée
-    if BaseDataConf["port"]:
-        listen_ports_info = get_listen_ports_info()
-        data["port"] = BaseDataConf["port"]
-        data["listen_ports"] = listen_ports_info
-    else:
-        data["listen_ports"] = []
 
     db_file_path = "/var/ids/db.json"
     with open(db_file_path, 'w') as json_file:
         json.dump(data, json_file, separators=(',', ':'))
 
     print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
-
 
 
 
