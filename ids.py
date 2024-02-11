@@ -213,6 +213,7 @@ def generate_report(files_changed, directories_changed):
 
     return report
 
+
 def Check():
     # Chargement de l'état actuel depuis le fichier db.json
     with open('/var/ids/db.json', 'r') as db_file:
