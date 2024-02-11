@@ -1,4 +1,5 @@
 import os
+import subprocess
 import logging
 
 def setup_logger(program_name):
@@ -13,3 +14,7 @@ def setup_logger(program_name):
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def CreateRight():
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids_log.log' ])
+    subprocess.run(['chown', '-R', 'ids:ids', '/etc/ids.json', '/var/ids/db.json'])
+    
