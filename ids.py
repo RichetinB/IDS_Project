@@ -70,6 +70,18 @@ BaseDataConf = {
 
 # Function Build##############################################################################
 
+def get_configuration():
+    config = {"file": [], "dir": [], "port": False}
+    config_file_path = "/etc/ids.json"
+    if os.path.exists(config_file_path):
+        with open(config_file_path, 'r') as f:
+            data = json.load(f)
+            config["file"] = data.get("file", [])
+            config["dir"] = data.get("dir", [])
+            config["port"] = data.get("port", False)
+    return config
+
+
 # Function to get the list of listening ports
 def get_listening_ports():
     # Using ss command to get the list of listening ports
@@ -79,6 +91,7 @@ def get_listening_ports():
 
 # Function to build the JSON file
 def Build():
+    get_configuration()
     if not is_initialized():
         print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
         return
