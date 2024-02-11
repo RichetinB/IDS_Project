@@ -87,19 +87,18 @@ def Build():
     files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
     directories_info = watch_paths["dir"]
 
-    listen_ports_info = []  # Liste des ports en écoute
-
     # Vérifier si la surveillance des ports est activée
-    if BaseDataConf["port"]:
-        # Obtenez les informations sur les ports en écoute
+    if is_port_enabled():
         listen_ports_info = get_listen_ports_info()
+    else:
+        listen_ports_info = []
 
     data = {
         "build_time": str(datetime.now()), 
         "files": files_info,       
         "directories": directories_info,  
-        "port": BaseDataConf["port"],  # Inclure l'état de la surveillance des ports
-        "listen_ports": listen_ports_info  # Inclure les informations sur les ports en écoute
+        "port": BaseDataConf["port"],  
+        "listen_ports": listen_ports_info  
     }
 
     db_file_path = "/var/ids/db.json"
@@ -116,6 +115,23 @@ def get_listen_ports_info():
         if conn.status == psutil.CONN_LISTEN:
             listen_ports_info.append({"port_number": conn.laddr.port, "protocol": conn.type})
     return listen_ports_info
+
+def is_port_enabled():
+    conf_file_path = "/etc/ids.json"
+    if os.path.exists(conf_file_path):
+        with open(conf_file_path, 'r') as json_file:
+            config_data = json.load(json_file)
+            return config_data.get("port", False)  # Renvoie la valeur de port ou False si elle n'est pas définie
+    else:
+        return False  # Si le fichier de configuration n'existe pas, retourne False par défaut
+
+if __name__ == '__main__':
+    # Vérifie si la surveillance des ports est activée dans le fichier de configuration
+    if is_port_enabled():
+        print("La surveillance des ports est activée.")
+        # Ajoutez ici le code pour récupérer les informations sur les ports
+    else:
+        print("La surveillance des ports n'est pas activée dans le fichier de configuration.")
 
 # Function to check if the system is initialized
 def is_initialized() -> bool:
