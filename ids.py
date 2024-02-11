@@ -65,7 +65,6 @@ BaseDataConf = {
     "file": [],
     "dir": [],
     "port": False,
-    "listen_ports": False
 }
 
 # Function Build##############################################################################
