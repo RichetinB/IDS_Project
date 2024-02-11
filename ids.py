@@ -54,6 +54,11 @@ def CreateRight():
     subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
     subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
     subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log', '/etc/ids.json', '/var/ids/db.json'])
+    try:
+        import psutil
+    except ImportError:
+        print("Installing psutil...")
+        subprocess.run(['pip', 'install', 'psutil'])
 
 def IsInit() -> bool:
     return os.path.exists("/etc/ids.json")
