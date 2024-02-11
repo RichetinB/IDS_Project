@@ -31,7 +31,7 @@ def CreateFileConf():
         ConfJson = json.dumps(BaseDataConf)
         with open("/etc/ids.json", "w") as jsonfile:
             jsonfile.write(ConfJson)
-            print("Write Success")
+            logger.info("Write Success")
 
 def CreateCloneJson():
     if os.path.isdir("/var/ids"):
