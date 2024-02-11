@@ -1,79 +1,85 @@
 from sys import argv
 import os
 import argparse
+import __future__
+import json
 import subprocess
 from datetime import datetime
-import hashlib
-import json
+import hashlib 
 
 # Argument 
-parser = argparse.ArgumentParser()
-parser.add_argument("-build", "--build", action="store_const", const=1, help="construit un fichier JSON qui contient un état des choses qu'on a demandé à surveiller")
-parser.add_argument("-check", "--check", action="store_const", const=1, help="vérifie que l'état actuel est conforme à ce qui a été stocké dans /var/ids/db.json")
-parser.add_argument("-init", "--init", action="store_const", const=1, help="Commande à Lancer dès la PREMIÈRE UTILISATION")
+parser= argparse.ArgumentParser()
+parser.add_argument( "-build", "--build", action="store_const", const=1, help="construit un fichier JSON qui contient un état des choses qu'on a demandé à surveiller")
+parser.add_argument( "-check", "--check", action="store_const", const=1, help="vérifie que l'état actuel est conforme à ce qui a été stocké dans | /var/ids/db.json | ")
+parser.add_argument( "-init", "--init", action="store_const", const=1, help="Commande à Lancer des la PREMIERE UTILISATION")
 arg = parser.parse_args()
 
+#FONCTION ##############################################################################
+
+def CreateFileConf():
+    if os.path.exists("/etc/ids.json"):
+        return
+    else:
+        open("/etc/ids.json", "x")
+        #Write Json Conf
+        ConfJson = json.dumps(BaseDataConf)
+        with open("/etc/ids.json", "w") as jsonfile:
+            jsonfile.write(ConfJson)
+            print("Write Succes")
+
+def CreateCloneJson():
+    if os.path.isdir("/var/ids"):
+        return 
+    else:
+        os.mkdir("/var/ids")
+        open("/var/ids/db.json", "x")
+
+def CreateLogs():
+    if os.path.exists("/var/log/ids.log"):
+        return
+    else:
+        open("/var/log/ids.log", "x")
+
+def CreateBin():
+    if os.path.isdir("/var/local/bin"):
+        return
+    else:
+        os.mkdir("/var/local/bin")
+        os.mkdir("/var/local/bin/ids")
+        #Bouger de place le fichier exe
+
+
+
+def CreateRight():
+    subprocess.run(['useradd    ', '-p', 'ids', 'ids'])
+    subprocess.run(['chmod', '-R', 'u+rw', '/etc/ids.json'])
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/ids/db.json' ])
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids.log' ])
+    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids.log' , '/etc/ids.json', '/var/ids/db.json'])
+
+
+def IsInit() -> bool:
+    if os.path.exists("/etc/ids.json"):
+        return True
+    else:
+        return False
+
+
+
+# Data #######################################################################################
+    
 
 BaseDataConf = {
-    "file": [],
-    "dir": [],
-    "port": False
+    "file":[],
+    "dir":[],
+    "port":False 
 }
 
-
-def create_init_script():
-    script_content = """
-    #!/bin/bash
-    # Contenu du script d'initialisation
-    """
-    script_path = "~/IDS_Project/init_script.sh"
-    with open(script_path, "w") as file:
-        file.write(script_content)
-
-    # Changer les permissions du script pour le rendre exécutable
-    subprocess.run(['sudo','chmod', 'u+x', script_path])
-
-def InitializeSystem():
-    script_path = "~/IDS_Project/init_script.sh"
-    subprocess.run([script_path])
+# Function Build##############################################################################
 
 
-
-# Fonction pour construire le fichier JSON
-def Build():
-    """
-    Construit le fichier JSON contenant les informations de surveillance.
-    """
-    if not IsInitialized():
-        print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
-        return
-
-    watch_paths = get_watch_paths()
-    files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
-
-    data = {
-        "build_time": str(datetime.now()), 
-        "files": files_info,       
-        "directories": watch_paths["dir"],  
-        "port": BaseDataConf["port"]       
-    }
-
-    db_file_path = "/var/ids/db.json"
-    with open(db_file_path, 'w') as json_file:
-        json.dump(data, json_file, separators=(',', ':'))
-
-    print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
-
-# Fonction pour vérifier si le système est initialisé
-def IsInitialized() -> bool:
-    return os.path.exists("/etc/ids.json")
-
-# Fonction pour vérifier l'état actuel par rapport au fichier de surveillance
-def Check():
-    """
-    Vérifie que l'état actuel est conforme à ce qui a été stocké dans /var/ids/db.json.
-    """
-    # Ajouter le code pour vérifier l'état par rapport au fichier JSON
+import hashlib
+import os
 
 # Fonction pour obtenir les informations sur un fichier
 def get_file_info(file_path):
@@ -111,14 +117,69 @@ def get_watch_paths():
 
     return watch_paths
 
-# Point d'entrée du script
-if __name__ == '__main__':
-    # Verifier quel argument est passé
-    if arg.init == 1:
-        create_init_script()
-        InitializeSystem()
+# Fonction pour construire le fichier JSON
+def Build():
+    if not is_initialized():
+        print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
+        return
 
-    elif arg.build == 1:
+    watch_paths = get_watch_paths()
+    files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
+
+    data = {
+        "build_time": str(datetime.now()), 
+        "files": files_info,       
+        "directories": watch_paths["dir"],  
+        "port": BaseDataConf["port"]  # Utilisez BaseDataConf["port"] au lieu de config_data["port"]        
+    }
+
+    db_file_path = "/var/ids/db.json"
+    with open(db_file_path, 'w') as json_file:
+        json.dump(data, json_file, separators=(',', ':'))
+
+    print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
+
+
+
+
+# Fonction pour vérifier si l'initialisation a déjà été effectuée
+def is_initialized() -> bool:
+    return os.path.exists("/etc/ids.json")
+
+
+
+
+################################################################################################
+
+
+if __name__ == '__main__':
+
+
+    #Verif Quelle arguement est passé
+    if arg.init == 1:
+        if IsInit() == False:
+            CreateFileConf()
+            CreateCloneJson()
+            CreateLogs()
+            CreateBin()
+            CreateRight()
+        else:
+            print("Le Init a Déja etais Utilisé")
+
+    #Verif Quelle arguement est passé
+    if arg.build == 1:
         Build()
-    elif arg.check == 1:
-        Check()
+        if IsInit() == False:
+            print("ERREUR: Utililse (-init) La premiere fois")
+        else:
+            print("build")
+
+
+    #Verif Quelle arguement est passé
+    if arg.check == 1:
+        if IsInit() == False:
+            print("ERREUR: Utililse (-init) La premiere fois")
+        else:
+            print("check")
+
+
