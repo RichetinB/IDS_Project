@@ -1,17 +1,33 @@
-from sys import argv
 import os
-import argparse
 import subprocess
-from datetime import datetime
+import logging
+import argparse
 import hashlib
 import json
 import psutil
-import log_manager
-import logging
+from datetime import datetime
+
+def setup_logger(program_name):
+    RightLog()
+    log_folder = '/var/log/' + program_name
+    log_file = os.path.join(log_folder, 'ids_log.log')
+
+    # Vérifie si le dossier de logs existe, sinon le crée
+    if not os.path.exists(log_folder):
+        os.makedirs(log_folder)
+
+    # Configure le logger pour écrire dans un fichier
+    logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-log_manager.setup_logger("IDS_Project")
-logger = logging.getLogger("IDS_Project")
+def RightLog():
+    subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids_log.log' ])
+    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids_log.log'])
+
+def log_command_execution(command, result):
+    logger.info(f"Commande exécutée: {command}")
+    logger.info(f"Résultat: {result}")
+
 
 # Argument 
 parser = argparse.ArgumentParser()
@@ -223,6 +239,9 @@ def Check():
 
 # Main entry point of the script
 if __name__ == '__main__':
+    # Configure le logger
+    setup_logger("IDS_Project")
+    logger = logging.getLogger("IDS_Project")
 
     # Check which argument is passed
     if arg.init == 1:
