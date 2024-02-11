@@ -176,6 +176,29 @@ def get_watch_paths():
 
     return watch_paths
 
+
+# Function to check if the current state is consistent with the stored state
+def Check():
+    # Load the stored state from /var/ids/db.json
+    with open("/var/ids/db.json", "r") as json_file:
+        stored_state = json.load(json_file)
+
+    # Get the current state
+    current_state = {
+        "files": [get_file_info(file_path) for file_path in stored_state["files"]],
+        "directories": stored_state["directories"],
+        "port": stored_state["port"]
+    }
+
+    # Compare the stored state with the current state
+    if stored_state == current_state:
+        # If nothing has changed, return {"state": "ok"}
+        return {"state": "ok"}
+    else:
+        # If there are differences, return a report indicating the divergences
+        return {"state": "divergent", "differences": {"files": current_state["files"], "directories": current_state["directories"], "port": current_state["port"]}}
+
+
 # Main entry point of the script
 if __name__ == '__main__':
 
@@ -198,6 +221,8 @@ if __name__ == '__main__':
             print("Construction du fichier JSON")
 
     if arg.check == 1:
+        result = Check()
+        print(json.dumps(result))
         if not IsInit():
             print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
         else:
