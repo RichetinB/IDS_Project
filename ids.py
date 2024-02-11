@@ -85,18 +85,19 @@ def Build():
     files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
     directories_info = watch_paths["dir"]
 
+    listen_ports_info = []  # Liste des ports en écoute
+
     # Vérifier si la surveillance des ports est activée
     if BaseDataConf["port"]:
+        # Obtenez les informations sur les ports en écoute
         listen_ports_info = get_listen_ports_info()
-    else:
-        listen_ports_info = []
 
     data = {
         "build_time": str(datetime.now()), 
         "files": files_info,       
         "directories": directories_info,  
-        "port": BaseDataConf["port"],  
-        "listen_ports": listen_ports_info  
+        "port": BaseDataConf["port"],  # Inclure l'état de la surveillance des ports
+        "listen_ports": listen_ports_info  # Inclure les informations sur les ports en écoute
     }
 
     db_file_path = "/var/ids/db.json"
@@ -104,6 +105,7 @@ def Build():
         json.dump(data, json_file, separators=(',', ':'))
 
     print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
+
 
 
 def get_listen_ports_info():
