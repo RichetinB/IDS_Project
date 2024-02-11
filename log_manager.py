@@ -16,5 +16,10 @@ def setup_logger(program_name):
 
 def CreateRight():
     subprocess.run(['chmod', '-R', 'u+rw', '/var/log/ids_log.log' ])
-    subprocess.run(['chown', '-R', 'ids:ids', '/etc/ids.json', '/var/ids/db.json'])
+    subprocess.run(['chown', '-R', 'ids:ids', '/var/log/ids_log.log'])
+    
+
+if __name__ == "__main__":
+    setup_logger("IDS_Project")
+    CreateRight()
     
