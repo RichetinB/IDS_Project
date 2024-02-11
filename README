@@ -19,7 +19,7 @@ cd IDS_Project
 - Installer les dépendances Python nécessaires :
 
 ```
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
 ```
 
 - Pour afficher l'aide et les options disponibles, exécutez la commande suivante :
