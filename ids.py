@@ -11,11 +11,9 @@ def setup_logger(program_name):
     log_folder = '/var/log/' + program_name
     log_file = os.path.join(log_folder, 'ids_log.log')
 
-    # Vérifie si le dossier de logs existe, sinon le crée
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
 
-    # Configure le logger pour écrire dans un fichier
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -75,7 +73,6 @@ BaseDataConf = {
 
 # Function to get the list of listening ports
 def get_listening_ports():
-    # Using ss command to get the list of listening ports
     result = subprocess.run(['ss', '-tuln'], capture_output=True, text=True)
     output = result.stdout
     return output
@@ -124,15 +121,13 @@ def is_port_enabled():
     if os.path.exists(conf_file_path):
         with open(conf_file_path, 'r') as json_file:
             config_data = json.load(json_file)
-            return config_data.get("port", False)  # Renvoie la valeur de port ou False si elle n'est pas définie
+            return config_data.get("port", False) 
     else:
-        return False  # Si le fichier de configuration n'existe pas, retourne False par défaut
+        return False 
 
 if __name__ == '__main__':
-    # Vérifie si la surveillance des ports est activée dans le fichier de configuration
     if is_port_enabled():
         print("La surveillance des ports est activée.")
-        # Ajoutez ici le code pour récupérer les informations sur les ports
     else:
         print("La surveillance des ports n'est pas activée dans le fichier de configuration.")
 
@@ -217,29 +212,22 @@ def generate_report(files_changed, directories_changed):
 
 
 def Check():
-    # Chargement de l'état actuel depuis le fichier db.json
     with open('/var/ids/db.json', 'r') as db_file:
         stored_state = json.load(db_file)
 
-    # Vérification des fichiers
     files_changed = check_files(stored_state["files"])
 
-    # Vérification des répertoires
     directories_changed = check_directories(stored_state["directories"])
 
-    # Construction du rapport
     report = generate_report(files_changed, directories_changed)
 
     return report
 
 
-# Main entry point of the script
 if __name__ == '__main__':
-    # Configure le logger
     setup_logger("IDS_Project")
     logger = logging.getLogger("IDS_Project")
 
-    # Check which argument is passed
     if arg.init == 1:
         logger.info("Initialisation du système")
         if not IsInit():
