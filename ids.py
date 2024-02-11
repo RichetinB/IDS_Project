@@ -6,6 +6,12 @@ from datetime import datetime
 import hashlib
 import json
 import psutil
+import log_manager
+import logging
+
+
+log_manager.setup_logger("IDS_Project")
+logger = logging.getLogger("IDS_Project")
 
 # Argument 
 parser = argparse.ArgumentParser()
@@ -220,6 +226,7 @@ if __name__ == '__main__':
 
     # Check which argument is passed
     if arg.init == 1:
+        logger.info("Initialisation du système")
         if not IsInit():
             CreateFileConf()
             CreateCloneJson()
@@ -229,6 +236,7 @@ if __name__ == '__main__':
 
     if arg.build == 1:
         Build()
+        logger.info("Fichier JSON construit")
         if not IsInit():
             print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
         else:
@@ -236,6 +244,7 @@ if __name__ == '__main__':
 
     if arg.check == 1:
         result = Check()
+        logger.info("Rapport de vérification: " + json.dumps(result, separators=(',', ':')))
         print(json.dumps(result, separators=(',', ':')))
         if not IsInit():
             print("ERREUR: Utilisez d'abord -init pour initialiser le système.")
