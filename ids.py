@@ -5,6 +5,7 @@ import subprocess
 from datetime import datetime
 import hashlib
 import json
+import psutil
 
 # Argument 
 parser = argparse.ArgumentParser()
@@ -110,20 +111,9 @@ def Build():
 
 def get_listen_ports_info():
     listen_ports_info = []
-
-    # Utilisation de la commande netstat pour obtenir les informations sur les ports en écoute
-    netstat_process = subprocess.Popen(['netstat', '-tuln'], stdout=subprocess.PIPE)
-    netstat_output = netstat_process.communicate()[0].decode()
-    lines = netstat_output.split('\n')
-    for line in lines[2:]:  # Ignorer les deux premières lignes
-        parts = line.split()
-        if len(parts) >= 4:
-            proto = parts[0]
-            local_address = parts[3]
-            if ':' in local_address:
-                port = local_address.split(':')[-1]
-                listen_ports_info.append({"port_number": port, "protocol": proto, "service": ""})
-
+    for conn in psutil.net_connections(kind='inet'):
+        if conn.status == psutil.CONN_LISTEN:
+            listen_ports_info.append({"port_number": conn.laddr.port, "protocol": conn.type})
     return listen_ports_info
 
 # Function to check if the system is initialized
