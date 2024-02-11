@@ -83,13 +83,20 @@ def Build():
 
     watch_paths = get_watch_paths()
     files_info = [get_file_info(file_path) for file_path in watch_paths["file"]]
+    directories_info = watch_paths["dir"]
+
+    # Vérifier si la surveillance des ports est activée
+    if BaseDataConf["port"]:
+        listen_ports_info = get_listen_ports_info()
+    else:
+        listen_ports_info = []
 
     data = {
         "build_time": str(datetime.now()), 
         "files": files_info,       
-        "directories": watch_paths["dir"],  
-        "port": BaseDataConf["port"],
-        "listen_ports": get_listening_ports() if BaseDataConf["listen_ports"] else "Port monitoring disabled"
+        "directories": directories_info,  
+        "port": BaseDataConf["port"],  
+        "listen_ports": listen_ports_info  
     }
 
     db_file_path = "/var/ids/db.json"
@@ -98,9 +105,30 @@ def Build():
 
     print(f"Fichier JSON créé avec succès à l'emplacement : {db_file_path}")
 
+
+def get_listen_ports_info():
+    listen_ports_info = []
+
+    # Utilisation de la commande netstat pour obtenir les informations sur les ports en écoute
+    netstat_process = subprocess.Popen(['netstat', '-tuln'], stdout=subprocess.PIPE)
+    netstat_output = netstat_process.communicate()[0].decode()
+    lines = netstat_output.split('\n')
+    for line in lines[2:]:  # Ignorer les deux premières lignes
+        parts = line.split()
+        if len(parts) >= 4:
+            proto = parts[0]
+            local_address = parts[3]
+            if ':' in local_address:
+                port = local_address.split(':')[-1]
+                listen_ports_info.append({"port_number": port, "protocol": proto, "service": ""})
+
+    return listen_ports_info
+
 # Function to check if the system is initialized
 def is_initialized() -> bool:
     return os.path.exists("/etc/ids.json")
+
+
 
 # Function to get file information
 def get_file_info(file_path):
